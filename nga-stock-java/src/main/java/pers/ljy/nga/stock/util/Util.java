@@ -50,7 +50,7 @@ public class Util {
 		return body;
 	}
 	
-	public static String postByJson(String url,Map<String,String> param) throws ClientProtocolException, IOException {
+	public static String postByJson(String url,Map param) throws ClientProtocolException, IOException {
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		HttpPost post = new HttpPost(url);
 		UrlConstant.DINGDING_HEADERS.forEach((k,v)->{
