@@ -1,7 +1,9 @@
 package pers.ljy.nga.stock.main;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -151,13 +153,23 @@ public class PullMain {
 			// 去掉引用
 			contentStr = excludeQuote(contentStr);
 			// 处理图片
-			String img_url = "";
+			List<String> img_url = new ArrayList<>();
 			Matcher matcher = IMG_PATTERN.matcher(contentStr);
 			while (matcher.find()) {
-				img_url += matcher.group(1) + "\n";
+				img_url.add(matcher.group(1));
 			}
 			contentStr = excludeImg(contentStr);
+			// 修改为markdown语法
+			// 2020.8.18
+			/* 
+			 * #### xx楼
+			 * 作者：xx
+			 * > 引用内容
+			 * #### 回复
+			 * [图片][图片]
+			 * */
 			StringBuilder sb = new StringBuilder();
+			sb.append("#### ");
 			sb.append(json0.get("lou"));
 			sb.append("楼\n");
 			sb.append("时间:");
@@ -165,25 +177,31 @@ public class PullMain {
 			sb.append("作者:");
 			sb.append(authorName + "\n");
 			if (!StringUtils.isEmpty(replyContent)) {
-				sb.append("回复:");
+				sb.append("> ");
 				sb.append(replyContent + "\n");
-				sb.append("\n");
-
 			}
+			sb.append("#### ");
 			sb.append(contentStr);
-			if (!StringUtils.isEmpty(img_url)) {
-				sb.append("\n");
-				sb.append("[图片]" + img_url);
+			if (img_url.size()>0) {
+				img_url.forEach(img->{
+					sb.append("![](");
+					sb.append(img);
+					sb.append(")\n");
+				});
 			}
 			sb.append("\n");
 			sb.append("\n");
 			sb.append("\n查看原文链接:\n");
 			sb.append("https://bbs.nga.cn/read.php?tid=" + tid + "&page=" + staticcurrentPage);
 			JSONObject jsonParam = new JSONObject();
-			jsonParam.put("msgtype", "text");
 			JSONObject text = new JSONObject();
-			text.put("content", sb.toString());
-			jsonParam.put("text", text);
+			jsonParam.put("msgtype", "markdown");
+			jsonParam.put("markdown", text);
+//			jsonParam.put("msgtype", "text");
+			text.put("title", "新消息");
+			text.put("text", sb.toString());
+//			text.put("content", sb.toString());
+//			jsonParam.put("text", text);
 			String rs = Util.postByJson(sendUrl, jsonParam);
 		} catch (NullPointerException e) {
 		}
