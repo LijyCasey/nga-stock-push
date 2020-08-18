@@ -177,7 +177,7 @@ public class PullMain {
 			sb.append(authorName + "\n");
 			if (!StringUtils.isEmpty(replyContent)) {
 				sb.append("> ");
-				sb.append(replyContent + "\n");
+				sb.append(replyContent + "\n\n");
 			}
 			sb.append("#### ");
 			sb.append(contentStr);
@@ -188,10 +188,9 @@ public class PullMain {
 					sb.append(")\n");
 				});
 			}
+			sb.append("\n\n");
 			sb.append("#### \n\n");
-			sb.append("#### \n\n");
-			sb.append("#### \n\n");
-			sb.append("[点击查看原文链接](https://bbs.nga.cn/read.php?tid=" + tid + "&page=" + staticcurrentPage+")");
+			sb.append("[点击查看原文](https://bbs.nga.cn/read.php?tid=" + tid + "&page=" + staticcurrentPage+")");
 			JSONObject jsonParam = new JSONObject();
 			JSONObject text = new JSONObject();
 			jsonParam.put("msgtype", "markdown");
