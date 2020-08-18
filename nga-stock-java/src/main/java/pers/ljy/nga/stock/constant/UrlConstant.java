@@ -3,6 +3,10 @@ package pers.ljy.nga.stock.constant;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component
 public class UrlConstant {
 
 	public static String METHOD = "post";
@@ -17,5 +21,12 @@ public class UrlConstant {
 		HEADERS.put("User-Agent", "NGA/6.0.7 (iPhone; iOS 12.2; Scale/3.00)");
 		HEADERS.put("Accept-Language", "zh-Hans-CN;q=1");
 		DINGDING_HEADERS.put("Content-Type", "application/json");
+	}
+
+	public static String URL;
+
+	@Value("${nga.api.url}")
+	public void setUrl(String url) {
+		UrlConstant.URL = url;
 	}
 }

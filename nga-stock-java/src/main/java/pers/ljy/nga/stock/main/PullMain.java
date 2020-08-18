@@ -12,6 +12,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import com.jayway.jsonpath.Configuration;
@@ -53,9 +54,7 @@ public class PullMain {
 
 	private String sendUrl;
 	
-	@Value("${nga.api.url}")
-	private String url;
-
+	
 	public PullMain(String tid, String sendUrl) {
 		this.tid = tid;
 		this.sendUrl = sendUrl;
@@ -65,7 +64,7 @@ public class PullMain {
 		Map<String, String> param = new HashMap<>();
 		param.put("tid", tid);
 		param.put("page", page + "");
-		String allRs = Util.post(url, UrlConstant.HEADERS, param);
+		String allRs = Util.post(UrlConstant.URL, UrlConstant.HEADERS, param);
 		Configuration conf = Configuration.defaultConfiguration();
 		Object document = conf.jsonProvider().parse(allRs);
 		return document;
@@ -171,10 +170,10 @@ public class PullMain {
 			StringBuilder sb = new StringBuilder();
 			sb.append("#### ");
 			sb.append(json0.get("lou"));
-			sb.append("楼\n");
+			sb.append("楼\n\n");
 			sb.append("时间:");
-			sb.append(postTime + "\n");
-			sb.append("作者:");
+			sb.append(postTime + "\n\n");
+			sb.append("#### 作者:");
 			sb.append(authorName + "\n");
 			if (!StringUtils.isEmpty(replyContent)) {
 				sb.append("> ");
@@ -189,10 +188,10 @@ public class PullMain {
 					sb.append(")\n");
 				});
 			}
-			sb.append("\n");
-			sb.append("\n");
-			sb.append("\n查看原文链接:\n");
-			sb.append("https://bbs.nga.cn/read.php?tid=" + tid + "&page=" + staticcurrentPage);
+			sb.append("#### \n\n");
+			sb.append("#### \n\n");
+			sb.append("#### \n\n");
+			sb.append("[点击查看原文链接](https://bbs.nga.cn/read.php?tid=" + tid + "&page=" + staticcurrentPage+")");
 			JSONObject jsonParam = new JSONObject();
 			JSONObject text = new JSONObject();
 			jsonParam.put("msgtype", "markdown");
