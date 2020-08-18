@@ -264,7 +264,7 @@ public class PullMain {
 //		main.init("mainFloor");
 //		PullMain qiaoPull = new PullMain(UrlConstant.QIAO_TID, UrlConstant.QIAO_DING_URL);
 //		qiaoPull.init("qiaobangzhu");
-		String sendUrl = "https://oapi.dingtalk.com/robot/send?access_token=23a218871239635808764314bf05c617a692c8d2d1066647617f42ac5ae4516b";
+//		String sendUrl = "https://oapi.dingtalk.com/robot/send?access_token=23a218871239635808764314bf05c617a692c8d2d1066647617f42ac5ae4516b";
 //		Map<String, String> param = new HashMap<>();
 //		param.put("tid", "" + 21729074);
 //		param.put("page", "" + 3036);
@@ -279,21 +279,21 @@ public class PullMain {
 //			System.out.println(matcher.group(1));
 //		}
 //		System.out.println(excludeQuote(str));
-		StringBuilder sb = new StringBuilder();
-		sb.append("#### 62367楼  \n");
-		sb.append("作者:qiaoxuejia\n");
-		sb.append("> 引用:感觉快了吧，信号弹已经打出来了，疫情不大规模反弹，院线要复苏了。感觉最近电影相关股票都有可能走一波。\n");
-		sb.append("#### 回复:周一看看，这个板块埋伏资金不少，容易坑，咱们得掂量掂量，如果不是高开低走的话，找两个投机倒把的也不是不行\n");
-		sb.append("![](http://img.nga.178.com/attachments/mon_201209/14/-47218_5052bc4cc6331.png)\n");
-		sb.append("![](http://img.nga.178.com/attachments/mon_201212/24/-1324875_50d841a63a673.png)");
-		Map map = new HashMap<>();
-		Map markdown = new HashMap<>();
-		map.put("msgtype", "markdown");
-		map.put("markdown",markdown);
-		markdown.put("title", "乔帮主推送");
-		markdown.put("text", sb.toString());
-		String param = JSONObject.toJSONString(map);
-		String rs = Util.postByJson(sendUrl, map);
-		System.out.println(rs);
+//		StringBuilder sb = new StringBuilder();
+//		sb.append("#### 62367楼  \n");
+//		sb.append("作者:qiaoxuejia\n");
+//		sb.append("> 引用:感觉快了吧，信号弹已经打出来了，疫情不大规模反弹，院线要复苏了。感觉最近电影相关股票都有可能走一波。\n");
+//		sb.append("#### 回复:周一看看，这个板块埋伏资金不少，容易坑，咱们得掂量掂量，如果不是高开低走的话，找两个投机倒把的也不是不行\n");
+//		sb.append("![](http://img.nga.178.com/attachments/mon_201209/14/-47218_5052bc4cc6331.png)\n");
+//		sb.append("![](http://img.nga.178.com/attachments/mon_201212/24/-1324875_50d841a63a673.png)");
+//		Map map = new HashMap<>();
+//		Map markdown = new HashMap<>();
+//		map.put("msgtype", "markdown");
+//		map.put("markdown",markdown);
+//		markdown.put("title", "乔帮主推送");
+//		markdown.put("text", sb.toString());
+//		String param = JSONObject.toJSONString(map);
+//		String rs = Util.postByJson(sendUrl, map);
+//		System.out.println(rs);
 	}
 }
