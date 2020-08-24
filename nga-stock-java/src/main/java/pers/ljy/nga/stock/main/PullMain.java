@@ -11,8 +11,6 @@ import java.util.regex.Pattern;
 import org.apache.http.client.ClientProtocolException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import com.jayway.jsonpath.Configuration;
@@ -53,8 +51,7 @@ public class PullMain {
 	private String tid;
 
 	private String sendUrl;
-	
-	
+
 	public PullMain(String tid, String sendUrl) {
 		this.tid = tid;
 		this.sendUrl = sendUrl;
@@ -64,14 +61,22 @@ public class PullMain {
 		Map<String, String> param = new HashMap<>();
 		param.put("tid", tid);
 		param.put("page", page + "");
-		String allRs = Util.post(UrlConstant.URL, UrlConstant.HEADERS, param);
-		Configuration conf = Configuration.defaultConfiguration();
-		Object document = conf.jsonProvider().parse(allRs);
-		return document;
+		try {
+			String allRs = Util.post(UrlConstant.URL, UrlConstant.HEADERS, param);
+			Configuration conf = Configuration.defaultConfiguration();
+			Object document = conf.jsonProvider().parse(allRs);
+			return document;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public void listenNewMessage() throws ClientProtocolException, IOException {
 		Object obj = fetchData(staticcurrentPage);
+		if(obj == null) {
+			return;
+		}
 //		Object result = JsonPath.read(obj, "$.result");
 		int length = 0;
 		try {
@@ -158,15 +163,6 @@ public class PullMain {
 				img_url.add(matcher.group(1));
 			}
 			contentStr = excludeImg(contentStr);
-			// 修改为markdown语法
-			// 2020.8.18
-			/* 
-			 * #### xx楼
-			 * 作者：xx
-			 * > 引用内容
-			 * #### 回复
-			 * [图片][图片]
-			 * */
 			StringBuilder sb = new StringBuilder();
 			sb.append("#### ");
 			sb.append(json0.get("lou"));
@@ -181,8 +177,8 @@ public class PullMain {
 			}
 			sb.append("#### ");
 			sb.append(contentStr);
-			if (img_url.size()>0) {
-				img_url.forEach(img->{
+			if (img_url.size() > 0) {
+				img_url.forEach(img -> {
 					sb.append("![](");
 					sb.append(img);
 					sb.append(")\n");
@@ -190,7 +186,7 @@ public class PullMain {
 			}
 			sb.append("\n\n");
 			sb.append("#### \n\n");
-			sb.append("[点击查看原文](https://bbs.nga.cn/read.php?tid=" + tid + "&page=" + staticcurrentPage+")");
+			sb.append("[点击查看原文](https://bbs.nga.cn/read.php?tid=" + tid + "&page=" + staticcurrentPage + ")");
 			JSONObject jsonParam = new JSONObject();
 			JSONObject text = new JSONObject();
 			jsonParam.put("msgtype", "markdown");
@@ -259,41 +255,12 @@ public class PullMain {
 		}, threadname).start();
 	}
 
-	public static void main(String[] args) throws ClientProtocolException, IOException {
-//		PullMain main = new PullMain(UrlConstant.TID, UrlConstant.DING_URL);
-//		main.init("mainFloor");
-//		PullMain qiaoPull = new PullMain(UrlConstant.QIAO_TID, UrlConstant.QIAO_DING_URL);
-//		qiaoPull.init("qiaobangzhu");
-//		String sendUrl = "https://oapi.dingtalk.com/robot/send?access_token=23a218871239635808764314bf05c617a692c8d2d1066647617f42ac5ae4516b";
+//	public static void main(String[] args) throws ClientProtocolException, IOException {
 //		Map<String, String> param = new HashMap<>();
-//		param.put("tid", "" + 21729074);
-//		param.put("page", "" + 3036);
-//		String allRs = Util.post(UrlConstant.URL, UrlConstant.HEADERS, param);
-//		Configuration conf = Configuration.defaultConfiguration();
-//		Object document = conf.jsonProvider().parse(allRs);
-//		String str = (String) JsonPath.read(document, "$.result[19].content");
-//		System.out.println((Object) JsonPath.read(document, "$.result"));
-//		String str = "[quote][pid=445489970,21729074,3036]Reply[\\/pid] <b>Post by [uid=17316127]夜冉OK[\\/uid] (2020-08-16 17:07):<\\/b><br\\/><br\\/>还木有消息。[img]http:\\/\\/img.nga.178.com\\/attachments\\/mon_201209\\/14\\/-47218_5052bc4cc6331.png[\\/img]感觉快了吧，信号弹已经打出来了，疫情不大规模反弹，院线要复苏了。感觉最近电影相关股票都有可能走一波。[img]http:\\/\\/img.nga.178.com\\/attachments\\/mon_201212\\/24\\/-1324875_50d841a63a673.png[\\/img]毕竟疫苗看起来也快了嘛。[\\/quote]周一看看，这个板块埋伏资金不少，容易坑，咱们得掂量掂量，如果不是高开低走的话，找两个投机倒把的也不是不行";
-//		Matcher matcher = IMG_PATTERN.matcher(str);
-//		while(matcher.find()) {
-//			System.out.println(matcher.group(1));
-//		}
-//		System.out.println(excludeQuote(str));
-//		StringBuilder sb = new StringBuilder();
-//		sb.append("#### 62367楼  \n");
-//		sb.append("作者:qiaoxuejia\n");
-//		sb.append("> 引用:感觉快了吧，信号弹已经打出来了，疫情不大规模反弹，院线要复苏了。感觉最近电影相关股票都有可能走一波。\n");
-//		sb.append("#### 回复:周一看看，这个板块埋伏资金不少，容易坑，咱们得掂量掂量，如果不是高开低走的话，找两个投机倒把的也不是不行\n");
-//		sb.append("![](http://img.nga.178.com/attachments/mon_201209/14/-47218_5052bc4cc6331.png)\n");
-//		sb.append("![](http://img.nga.178.com/attachments/mon_201212/24/-1324875_50d841a63a673.png)");
-//		Map map = new HashMap<>();
-//		Map markdown = new HashMap<>();
-//		map.put("msgtype", "markdown");
-//		map.put("markdown",markdown);
-//		markdown.put("title", "乔帮主推送");
-//		markdown.put("text", sb.toString());
-//		String param = JSONObject.toJSONString(map);
-//		String rs = Util.postByJson(sendUrl, map);
-//		System.out.println(rs);
-	}
+//		param.put("tid", 19878633 + "");
+//		param.put("page", 99999 + "");
+//
+//		String url = Util.post("http://ngabbs.com/app_api.php?__lib=post&__act=list", UrlConstant.HEADERS, param);
+//		System.out.println(url);
+//	}
 }
