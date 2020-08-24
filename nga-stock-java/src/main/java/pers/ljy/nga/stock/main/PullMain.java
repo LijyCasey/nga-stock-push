@@ -93,7 +93,7 @@ public class PullMain {
 				System.out.println("值为：" + obj);
 				return;
 			}
-			int lou = JsonPath.read(obj, "$.result[" + (length - 1) + "].lou");
+			int lou = JsonPath.read(obj, "$.result[-1].lou");
 			if (currentPage == totalPage) {
 				if (staticcurrentFloor == lou) {
 //					System.out.println(tid+"当前楼层" + staticcurrentFloor + "，没有新内容");
@@ -255,12 +255,12 @@ public class PullMain {
 		}, threadname).start();
 	}
 
-//	public static void main(String[] args) throws ClientProtocolException, IOException {
-//		Map<String, String> param = new HashMap<>();
-//		param.put("tid", 19878633 + "");
-//		param.put("page", 99999 + "");
-//
-//		String url = Util.post("http://ngabbs.com/app_api.php?__lib=post&__act=list", UrlConstant.HEADERS, param);
-//		System.out.println(url);
-//	}
+	public static void main(String[] args) throws ClientProtocolException, IOException {
+		Map<String, String> param = new HashMap<>();
+		param.put("tid", 19878633 + "");
+		param.put("page", 99999 + "");
+
+		String url = Util.post("http://ngabbs.com/app_api.php?__lib=post&__act=list", UrlConstant.HEADERS, param);
+		System.out.println(url);
+	}
 }
