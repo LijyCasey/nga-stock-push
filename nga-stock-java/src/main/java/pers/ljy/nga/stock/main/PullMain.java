@@ -66,7 +66,7 @@ public class PullMain {
 			Configuration conf = Configuration.defaultConfiguration();
 			Object document = conf.jsonProvider().parse(allRs);
 			return document;
-		}catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
@@ -74,7 +74,11 @@ public class PullMain {
 
 	public void listenNewMessage() throws ClientProtocolException, IOException {
 		Object obj = fetchData(staticcurrentPage);
-		if(obj == null) {
+		if (obj == null) {
+			return;
+		}
+		Integer code = JsonPath.read(obj, "$.code");
+		if (code == null || code.intValue() != 0) {
 			return;
 		}
 //		Object result = JsonPath.read(obj, "$.result");
@@ -82,7 +86,9 @@ public class PullMain {
 		try {
 			length = JsonPath.read(obj, "$.result.size()");
 		} catch (NullPointerException e) {
-			System.out.println("length = JsonPath.read(obj, \"$.result.size()\") 空指针了");
+			logger.error("length = JsonPath.read(obj, \"$.result.size()\") 空指针了",e);
+		} catch (PathNotFoundException e2) {
+			logger.error("没取到数据");
 		}
 		try {
 			int currentPage = JsonPath.read(obj, "$.currentPage");
@@ -156,6 +162,8 @@ public class PullMain {
 			String replyContent = resolveReply(contentStr);
 			// 去掉引用
 			contentStr = excludeQuote(contentStr);
+			// 去掉回复
+			contentStr = excludeReply(contentStr);
 			// 处理图片
 			List<String> img_url = new ArrayList<>();
 			Matcher matcher = IMG_PATTERN.matcher(contentStr);
@@ -199,6 +207,11 @@ public class PullMain {
 			String rs = Util.postByJson(sendUrl, jsonParam);
 		} catch (NullPointerException e) {
 		}
+	}
+
+	private String excludeReply(String contentStr) {
+		String rs = contentStr.replaceAll("<b>Reply to(.+?)<br/>", "");
+		return null;
 	}
 
 	private String excludeImg(String contentStr) {
@@ -258,7 +271,7 @@ public class PullMain {
 	public static void main(String[] args) throws ClientProtocolException, IOException {
 		Map<String, String> param = new HashMap<>();
 		param.put("tid", 19878633 + "");
-		param.put("page", 99999 + "");
+		param.put("page", 5371 + "");
 
 		String url = Util.post("http://ngabbs.com/app_api.php?__lib=post&__act=list", UrlConstant.HEADERS, param);
 		System.out.println(url);
