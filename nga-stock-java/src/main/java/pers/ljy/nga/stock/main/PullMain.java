@@ -77,10 +77,16 @@ public class PullMain {
 		if (obj == null) {
 			return;
 		}
-		Integer code = JsonPath.read(obj, "$.code");
-		if (code == null || code.intValue() != 0) {
+		try {
+			Integer code = JsonPath.read(obj, "$.code");
+			if (code == null || code.intValue() != 0) {
+				return;
+			}
+		}catch(Exception e) {
+			logger.error("code都没取到，是取了个什么鬼东西："+obj);
 			return;
 		}
+		
 //		Object result = JsonPath.read(obj, "$.result");
 		int length = 0;
 		try {
@@ -211,7 +217,7 @@ public class PullMain {
 
 	private String excludeReply(String contentStr) {
 		String rs = contentStr.replaceAll("<b>Reply to(.+?)<br/>", "");
-		return null;
+		return rs;
 	}
 
 	private String excludeImg(String contentStr) {
@@ -269,11 +275,5 @@ public class PullMain {
 	}
 
 	public static void main(String[] args) throws ClientProtocolException, IOException {
-		Map<String, String> param = new HashMap<>();
-		param.put("tid", 19878633 + "");
-		param.put("page", 5371 + "");
-
-		String url = Util.post("http://ngabbs.com/app_api.php?__lib=post&__act=list", UrlConstant.HEADERS, param);
-		System.out.println(url);
 	}
 }
