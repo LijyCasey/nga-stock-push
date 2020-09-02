@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>pers.ljy</groupId>
 	<artifactId>nga-stock-java</artifactId>
-	<version>1.0.3.RELEASE</version>
+	<version>1.0.4.RELEASE</version>
 	<name>nga-stock-java</name>
 	<description>nga股楼爬虫</description>
 
