@@ -116,7 +116,10 @@ public class PullMain {
 				System.out.println("该翻页了.");
 				System.out.println("当前楼层：" + staticcurrentFloor);
 				System.out.println("当前消息楼：" + lou);
-				System.out.println();
+				if(!(lou+"").endsWith("9")) {
+					//TODO
+					logger.info("消息不是以9结尾，再获取一次,待实现");
+				}
 				if (staticcurrentFloor == lou) {
 					this.staticcurrentPage += 1;
 				} else if (staticcurrentFloor > lou) {

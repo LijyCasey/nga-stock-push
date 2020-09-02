@@ -19,6 +19,10 @@ public class AutoRunner implements ApplicationRunner{
 	String ding_url;
 	@Value("${dingtalk.url.qiao}")
 	String qiao_ding_url;
+	@Value("${dingtalk.url.hlg}")
+	String hlg_ding_url;
+	@Value("${nga.hlg.stock.tid}")
+	String hlg_tid;
 	
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
@@ -26,6 +30,8 @@ public class AutoRunner implements ApplicationRunner{
 		main.init("main-floor");
 		PullMain qiaoPull = new PullMain(qiao_tid,qiao_ding_url);
 		qiaoPull.init("qiao-floor");
+		PullMain hlgPull = new PullMain(hlg_tid, hlg_ding_url);
+		hlgPull.init("hlg-floor");
 	}
 
 	
