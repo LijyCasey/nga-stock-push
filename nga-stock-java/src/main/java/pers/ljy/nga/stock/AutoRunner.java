@@ -23,6 +23,14 @@ public class AutoRunner implements ApplicationRunner{
 	String hlg_ding_url;
 	@Value("${nga.hlg.stock.tid}")
 	String hlg_tid;
+	@Value("${dingtalk.url.cow}")
+	String cow_ding_url;
+	@Value("${dingtalk.url.hege}")
+	String hege_ding_url;
+	@Value("${nga.cow.stock.tid}")
+	String cow_tid;
+	@Value("${nga.hege.stock.tid}")
+	String hege_tid;
 	
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
@@ -32,6 +40,10 @@ public class AutoRunner implements ApplicationRunner{
 		qiaoPull.init("qiao-floor");
 		PullMain hlgPull = new PullMain(hlg_tid, hlg_ding_url);
 		hlgPull.init("hlg-floor");
+		PullMain cowPull = new PullMain(cow_tid, cow_ding_url);
+		cowPull.init("cow-floor");
+		PullMain hegePull = new PullMain(hege_tid,hege_ding_url);
+		hegePull.init("hege-floor");
 	}
 
 	

@@ -13,5 +13,7 @@ public class Author {
 		authors.put(42255599, "天之藍～");
 		authors.put(533348, "colaman2006");
 		authors.put(60002731, "qiaoxuejia");
+		authors.put(4627122, "牛中牛神");
+		authors.put(150058, "阿狼");
 	}
 }
