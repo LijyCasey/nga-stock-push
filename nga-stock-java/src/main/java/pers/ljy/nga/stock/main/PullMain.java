@@ -43,6 +43,10 @@ public class PullMain {
 
 	private static final Pattern IMG_PATTERN = Pattern.compile("\\[img\\](.+?)\\[\\/img\\]");
 
+	private static final String LEFT_URL_PATTERN = "\\[\\/url\\]";
+
+	private static final String RIGHT_URL_PATTERN = "\\[url\\]";
+
 	private static final Pattern QUOTE_PATTERN = Pattern.compile(QUOTE_PATTERN_str);
 	private int staticcurrentPage = 1;
 
@@ -82,17 +86,17 @@ public class PullMain {
 			if (code == null || code.intValue() != 0) {
 				return;
 			}
-		}catch(Exception e) {
-			logger.error("code都没取到，是取了个什么鬼东西："+obj);
+		} catch (Exception e) {
+			logger.error("code都没取到，是取了个什么鬼东西：" + obj);
 			return;
 		}
-		
+
 //		Object result = JsonPath.read(obj, "$.result");
 		int length = 0;
 		try {
 			length = JsonPath.read(obj, "$.result.size()");
 		} catch (NullPointerException e) {
-			logger.error("length = JsonPath.read(obj, \"$.result.size()\") 空指针了",e);
+			logger.error("length = JsonPath.read(obj, \"$.result.size()\") 空指针了", e);
 		} catch (PathNotFoundException e2) {
 			logger.error("没取到数据");
 		}
@@ -116,8 +120,8 @@ public class PullMain {
 				System.out.println("该翻页了.");
 				System.out.println("当前楼层：" + staticcurrentFloor);
 				System.out.println("当前消息楼：" + lou);
-				if(!(lou+"").endsWith("9")) {
-					//TODO
+				if (!(lou + "").endsWith("9")) {
+					// TODO
 					logger.info("消息不是以9结尾，再获取一次,待实现");
 				}
 				if (staticcurrentFloor == lou) {
@@ -167,12 +171,15 @@ public class PullMain {
 			}
 			String postTime = (String) json0.get("postdate");
 			String contentStr = (String) json0.get("content");
+			// 修改url链接格式
+			contentStr = excludeUrl(contentStr);
 			// 获取引用
 			String replyContent = resolveReply(contentStr);
 			// 去掉引用
 			contentStr = excludeQuote(contentStr);
 			// 去掉回复
 			contentStr = excludeReply(contentStr);
+			
 			// 处理图片
 			List<String> img_url = new ArrayList<>();
 			Matcher matcher = IMG_PATTERN.matcher(contentStr);
@@ -230,15 +237,23 @@ public class PullMain {
 	}
 
 	// 处理主消息
-	private static String excludeQuote(String contentStr) {
+	private String excludeQuote(String contentStr) {
 		// 把引用内容去掉
 		String rs = contentStr.replaceAll(QUOTE_PATTERN_str, "");
 		rs = rs.replaceAll(BR_PATTERN_str, "\n");
 		return rs;
 	}
 
+	// 处理回复
+	private String excludeUrl(String contentStr) {
+		String rs = contentStr.replaceAll(LEFT_URL_PATTERN, "");
+		rs = rs.replaceAll(RIGHT_URL_PATTERN, "");
+		return rs;
+	}
+
+//TODO
 	// 处理回复的消息
-	private static String resolveReply(String contentStr) {
+	private String resolveReply(String contentStr) {
 		Matcher matcher = QUOTE_PATTERN.matcher(contentStr);
 		if (matcher.find()) {
 			try {
