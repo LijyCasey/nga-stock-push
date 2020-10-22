@@ -155,8 +155,8 @@ public class PullMain {
 		try {
 			JSONArray json = (JSONArray) content;
 			if (json.size() == 0) {
-				System.out.println("sendMessage中: " + staticcurrentFloor + "楼了，但是没取到消息，不处理");
-				System.out.println("sendMessage中: 结果中的当前页是：" + JsonPath.read(result, "$.currentPage") + "结果中的总页面是："
+				logger.info("sendMessage中: " + staticcurrentFloor + "楼了，但是没取到消息，不处理");
+				logger.info("sendMessage中: 结果中的当前页是：" + JsonPath.read(result, "$.currentPage") + "结果中的总页面是："
 						+ JsonPath.read(result, "TOTAL_PAGE"));
 				// 被抽楼了 +1楼 //8.3 9.26
 //				staticcurrentFloor+=1;
@@ -271,9 +271,13 @@ public class PullMain {
 		return null;
 	}
 
-	public void init(String threadname) throws ClientProtocolException, IOException {
-		System.out.println("init success.tid=" + tid + " sendUrl=" + sendUrl);
+	public void init(String threadname) throws ClientProtocolException, IOException, InterruptedException {
+		logger.info("init success.tid=" + tid + " sendUrl=" + sendUrl);
 		Object document = fetchData(9999999);
+		logger.info(document.toString());
+		synchronized (PullMain.class) {
+			Thread.sleep(30000);
+		}
 		staticcurrentPage = JsonPath.read(document, TOTAL_PAGE);
 		staticcurrentFloor = (Integer) JsonPath.read(document, V_ROWS) - 1;
 		new Thread(() -> {
