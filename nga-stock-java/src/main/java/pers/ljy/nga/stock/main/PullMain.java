@@ -40,12 +40,10 @@ public class PullMain {
 	private static final String BR_PATTERN_str = "<br\\/>";
 
 	private static final String PID_PATTERN_str = "\\[pid=(.*)\\[(.*)pid]";
+	
+	private static final String URL_PATTERN_str = "\\[url\\](.+?)\\[\\/url\\]";
 
 	private static final Pattern IMG_PATTERN = Pattern.compile("\\[img\\](.+?)\\[\\/img\\]");
-
-	private static final String LEFT_URL_PATTERN = "\\[\\/url\\]";
-
-	private static final String RIGHT_URL_PATTERN = "\\[url\\]";
 
 	private static final Pattern QUOTE_PATTERN = Pattern.compile(QUOTE_PATTERN_str);
 	private int staticcurrentPage = 1;
@@ -246,9 +244,7 @@ public class PullMain {
 
 	// 处理回复
 	private String excludeUrl(String contentStr) {
-		String rs = contentStr.replaceAll(LEFT_URL_PATTERN, "");
-		rs = rs.replaceAll(RIGHT_URL_PATTERN, "");
-		return rs;
+		return contentStr.replaceAll(URL_PATTERN_str, "[外部链接]($1)");
 	}
 
 //TODO
@@ -296,6 +292,4 @@ public class PullMain {
 		}, threadname).start();
 	}
 
-	public static void main(String[] args) throws ClientProtocolException, IOException {
-	}
 }
