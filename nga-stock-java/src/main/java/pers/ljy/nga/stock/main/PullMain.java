@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,6 +30,8 @@ public class PullMain {
 
 	Logger logger = LoggerFactory.getLogger(getClass());
 
+	private static final ThreadPoolExecutor THREAD_POOL = new ThreadPoolExecutor(0, 30, 60L, TimeUnit.SECONDS,
+			new SynchronousQueue<>());
 	private static final String TOTAL_PAGE = "$.totalPage";
 
 	private static final String V_ROWS = "$.vrows";
@@ -40,7 +45,7 @@ public class PullMain {
 	private static final String BR_PATTERN_str = "<br\\/>";
 
 	private static final String PID_PATTERN_str = "\\[pid=(.*)\\[(.*)pid]";
-	
+
 	private static final String URL_PATTERN_str = "\\[url\\](.+?)\\[\\/url\\]";
 
 	private static final Pattern IMG_PATTERN = Pattern.compile("\\[img\\](.+?)\\[\\/img\\]");
@@ -102,9 +107,9 @@ public class PullMain {
 			int currentPage = JsonPath.read(obj, "$.currentPage");
 			int totalPage = JsonPath.read(obj, TOTAL_PAGE);
 			if (length == 0) {
-				System.out.println("当前页为：" + staticcurrentPage + " 取到的result值为0" + ",结果中的当前页是："
+				logger.info("当前页为：" + staticcurrentPage + " 取到的result值为0" + ",结果中的当前页是："
 						+ JsonPath.read(obj, "$.currentPage") + "结果中的总页面是：" + JsonPath.read(obj, TOTAL_PAGE));
-				System.out.println("值为：" + obj);
+				logger.info("值为：" + obj);
 				return;
 			}
 			int lou = JsonPath.read(obj, "$.result[-1].lou");
@@ -115,12 +120,32 @@ public class PullMain {
 				}
 				handleMessage(obj, lou);
 			} else {
-				System.out.println("该翻页了.");
-				System.out.println("当前楼层：" + staticcurrentFloor);
-				System.out.println("当前消息楼：" + lou);
+				logger.info("该翻页了,当前楼：{}", staticcurrentPage);
+				logger.info("当前楼层：" + staticcurrentFloor);
+				logger.info("当前消息楼：" + lou);
 				if (!(lou + "").endsWith("9")) {
-					// TODO
-					logger.info("消息不是以9结尾，再获取一次,待实现");
+					final int syncPage = staticcurrentPage;
+					final int syncfloor = staticcurrentPage * 20 - 1;
+					final int qfloor = lou + 1;
+					// update 1.13:新增补偿被抽楼的楼层
+					logger.info("消息不是以9结尾就翻页了，理论最后一楼：{},等待补偿。", syncfloor);
+					THREAD_POOL.execute(() -> {
+						try {
+							TimeUnit.SECONDS.sleep(30);
+							Object syncObj = fetchData(syncPage);
+							int nowFloor = JsonPath.read(syncObj, "$.result[-1].lou");
+							logger.info("异步再次获取{}页的消息，现在的楼是{}", syncPage, nowFloor);
+							for (int i = qfloor; i <= syncfloor; i++) {
+								handleMessage(syncObj, i);
+							}
+						} catch (ClientProtocolException e) {
+							e.printStackTrace();
+						} catch (IOException e) {
+							e.printStackTrace();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					});
 				}
 				if (staticcurrentFloor == lou) {
 					this.staticcurrentPage += 1;
@@ -177,7 +202,7 @@ public class PullMain {
 			contentStr = excludeQuote(contentStr);
 			// 去掉回复
 			contentStr = excludeReply(contentStr);
-			
+
 			// 处理图片
 			List<String> img_url = new ArrayList<>();
 			Matcher matcher = IMG_PATTERN.matcher(contentStr);
