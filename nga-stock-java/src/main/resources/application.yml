@@ -1,0 +1,18 @@
+server:
+  port: 15789
+nga:
+  stock:
+    - tid: 24929430
+      name: 主楼
+    - tid: 24929177
+      name: 乔帮专楼
+    - tid: 24913158
+      name: 牛神专楼
+    - tid: 24900465
+      name: 禾戈专楼
+    - tid: 24906978
+      name: 白博专楼
+  api:
+    url: http://ngabbs.com/app_api.php?__lib=post&__act=list
+  dingding:
+    url: 
