@@ -292,14 +292,16 @@ public class PullMain {
 	}
 
 	public void init() throws ClientProtocolException, IOException, InterruptedException {
-		logger.info("{} init success.tid:{}", name, tid);
-		Object document = fetchData(9999999);
-		logger.info(document.toString());
-		synchronized (PullMain.class) {
-			Thread.sleep(30000);
+		while (staticcurrentPage == 1 && staticcurrentFloor == 1) {
+			try {
+				Object document = fetchData(9999999);
+				staticcurrentPage = JsonPath.read(document, TOTAL_PAGE);
+				staticcurrentFloor = (Integer) JsonPath.read(document, V_ROWS) - 1;
+			} catch (Exception e) {
+				TimeUnit.SECONDS.sleep(5);
+			}
 		}
-		staticcurrentPage = JsonPath.read(document, TOTAL_PAGE);
-		staticcurrentFloor = (Integer) JsonPath.read(document, V_ROWS) - 1;
+		logger.info("{} init success.tid:{}", name, tid);
 		new Thread(() -> {
 			while (true) {
 				try {
