@@ -190,7 +190,6 @@ public class PullMain {
 			if (StringUtils.isEmpty(authorName)) {
 				return;
 			}
-			String tsubject = JsonPath.read(result, "$.tsubject");
 			String postTime = (String) json0.get("postdate");
 			String contentStr = (String) json0.get("content");
 			Integer pid = (Integer) json0.get("pid");
@@ -211,7 +210,7 @@ public class PullMain {
 			}
 			contentStr = excludeImg(contentStr);
 			StringBuilder sb = new StringBuilder();
-			sb.append("#### " + tsubject + "\n");
+			sb.append("#### " + name + "\n");
 			sb.append("#### ");
 			sb.append(json0.get("lou"));
 			sb.append("楼\n\n");
