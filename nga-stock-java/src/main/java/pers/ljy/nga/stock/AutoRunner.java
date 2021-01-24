@@ -1,50 +1,30 @@
 package pers.ljy.nga.stock;
 
-import org.springframework.beans.factory.annotation.Value;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Component;
 
-import pers.ljy.nga.stock.main.PullMain;
+import pers.ljy.nga.stock.main.Properties;
+import pers.ljy.nga.stock.main.PullFactory;
+import pers.ljy.nga.stock.main.Properties.StockProperties;
 
 @Component
-public class AutoRunner implements ApplicationRunner{
+@Import(Properties.class)
+public class AutoRunner implements ApplicationRunner {
 
-	
-	@Value("${nga.stock.tid}")
-	String tid;
-	@Value("${nga.qiao.stock.tid}")
-	String qiao_tid;
-	@Value("${dingtalk.url}")
-	String ding_url;
-	@Value("${dingtalk.url.qiao}")
-	String qiao_ding_url;
-	@Value("${dingtalk.url.hlg}")
-	String hlg_ding_url;
-	@Value("${nga.hlg.stock.tid}")
-	String hlg_tid;
-	@Value("${dingtalk.url.cow}")
-	String cow_ding_url;
-	@Value("${dingtalk.url.hege}")
-	String hege_ding_url;
-	@Value("${nga.cow.stock.tid}")
-	String cow_tid;
-	@Value("${nga.hege.stock.tid}")
-	String hege_tid;
-	
+	@Autowired
+	Properties props;
+
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		PullMain main = new PullMain(tid,ding_url);
-		main.init("main-floor");
-		PullMain qiaoPull = new PullMain(qiao_tid,qiao_ding_url);
-		qiaoPull.init("qiao-floor");
-		PullMain hlgPull = new PullMain(hlg_tid, hlg_ding_url);
-		hlgPull.init("hlg-floor");
-		PullMain cowPull = new PullMain(cow_tid, cow_ding_url);
-		cowPull.init("cow-floor");
-		PullMain hegePull = new PullMain(hege_tid,hege_ding_url);
-		hegePull.init("hege-floor");
+		List<StockProperties> stocks = props.getStock();
+		stocks.forEach(s -> {
+			PullFactory.initPull(s.getTid(), s.getName());
+		});
 	}
 
-	
 }

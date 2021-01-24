@@ -2,6 +2,7 @@ package pers.ljy.nga.stock.util;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -72,5 +73,13 @@ public class Util {
 		String body = EntityUtils.toString(entity);
 		httpclient.close();
 		return body;
+	}
+	
+	public static void main(String[] args) throws ClientProtocolException, IOException {
+		Map<String, String> param = new HashMap<>();
+		param.put("tid", "24913158");
+		param.put("page", "826");
+		String response = post("http://ngabbs.com/app_api.php?__lib=post&__act=list",UrlConstant.HEADERS,param);
+		System.out.println(response);
 	}
 }

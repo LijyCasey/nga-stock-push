@@ -25,8 +25,15 @@ public class UrlConstant {
 
 	public static String URL;
 
+	public static String DINGDING_URL;
+
 	@Value("${nga.api.url}")
 	public void setUrl(String url) {
 		UrlConstant.URL = url;
+	}
+
+	@Value("${nga.dingding.url}")
+	public void setDingUrl(String dingUrl) {
+		UrlConstant.DINGDING_URL = dingUrl;
 	}
 }

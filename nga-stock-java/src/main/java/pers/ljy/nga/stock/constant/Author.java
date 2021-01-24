@@ -15,5 +15,7 @@ public class Author {
 		authors.put(60002731, "qiaoxuejia");
 		authors.put(4627122, "牛中牛神");
 		authors.put(150058, "阿狼");
+		authors.put(5254815, "禾戈禾戈");
+		authors.put(1904077, "白博士acbogeh");
 	}
 }

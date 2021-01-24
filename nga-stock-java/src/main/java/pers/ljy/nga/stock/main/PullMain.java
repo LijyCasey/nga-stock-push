@@ -38,7 +38,7 @@ public class PullMain {
 
 	private static final String QUOTE_PATTERN_str = "\\[quote\\](.+)\\[\\/quote\\]";
 
-	private static final String IMG_PATTERN_Str = "\\[img\\].+?\\[\\/img\\]";
+	private static final String IMG_PATTERN_Str = "\\[img\\](.+?)\\[\\/img\\]";
 
 	private static final String B_PATTERN_str = "<b>.+<\\/b>";
 
@@ -57,11 +57,11 @@ public class PullMain {
 
 	private String tid;
 
-	private String sendUrl;
+	private String name;
 
-	public PullMain(String tid, String sendUrl) {
+	public PullMain(String tid, String name) {
 		this.tid = tid;
-		this.sendUrl = sendUrl;
+		this.name = name;
 	}
 
 	public Object fetchData(int page) throws ClientProtocolException, IOException {
@@ -179,12 +179,10 @@ public class PullMain {
 			JSONArray json = (JSONArray) content;
 			if (json.size() == 0) {
 				logger.info("sendMessage中: " + staticcurrentFloor + "楼了，但是没取到消息，不处理");
-				logger.info("sendMessage中: 结果中的当前页是：" + JsonPath.read(result, "$.currentPage") + "结果中的总页面是："
-						+ JsonPath.read(result, "TOTAL_PAGE"));
-				// 被抽楼了 +1楼 //8.3 9.26
 //				staticcurrentFloor+=1;
 				return;
 			}
+			// 该楼的具体内容
 			Map json0 = (Map) json.get(0);
 			Map<String, Object> author = (Map<String, Object>) json0.get("author");
 			Integer uid = (Integer) author.get("uid");
@@ -194,6 +192,7 @@ public class PullMain {
 			}
 			String postTime = (String) json0.get("postdate");
 			String contentStr = (String) json0.get("content");
+			Integer pid = (Integer) json0.get("pid");
 			// 修改url链接格式
 			contentStr = excludeUrl(contentStr);
 			// 获取引用
@@ -211,6 +210,7 @@ public class PullMain {
 			}
 			contentStr = excludeImg(contentStr);
 			StringBuilder sb = new StringBuilder();
+			sb.append("#### " + name + "\n");
 			sb.append("#### ");
 			sb.append(json0.get("lou"));
 			sb.append("楼\n\n");
@@ -233,17 +233,14 @@ public class PullMain {
 			}
 			sb.append("\n\n");
 			sb.append("#### \n\n");
-			sb.append("[点击查看原文](https://bbs.nga.cn/read.php?tid=" + tid + "&page=" + staticcurrentPage + ")");
+			sb.append("[点击查看原文](https://bbs.nga.cn/read.php?tid=" + tid + "&pid=" + pid + ")");
 			JSONObject jsonParam = new JSONObject();
 			JSONObject text = new JSONObject();
 			jsonParam.put("msgtype", "markdown");
 			jsonParam.put("markdown", text);
-//			jsonParam.put("msgtype", "text");
 			text.put("title", "新消息");
 			text.put("text", sb.toString());
-//			text.put("content", sb.toString());
-//			jsonParam.put("text", text);
-			String rs = Util.postByJson(sendUrl, jsonParam);
+			String rs = Util.postByJson(UrlConstant.DINGDING_URL, jsonParam);
 		} catch (NullPointerException e) {
 		}
 	}
@@ -263,7 +260,8 @@ public class PullMain {
 	private String excludeQuote(String contentStr) {
 		// 把引用内容去掉
 		String rs = contentStr.replaceAll(QUOTE_PATTERN_str, "");
-		rs = rs.replaceAll(BR_PATTERN_str, "\n");
+		// update:把用br分段的字段也放大
+		rs = rs.replaceAll(BR_PATTERN_str, "\n #### ");
 		return rs;
 	}
 
@@ -279,7 +277,7 @@ public class PullMain {
 		if (matcher.find()) {
 			try {
 				String replyContent = matcher.group(1);
-				replyContent = replyContent.replaceAll(IMG_PATTERN_Str, "[图片]");
+				replyContent = replyContent.replaceAll(IMG_PATTERN_Str, "[图片]($1)");
 				replyContent = replyContent.replaceAll(BR_PATTERN_str, "");
 				replyContent = replyContent.replaceAll(PID_PATTERN_str, "");
 				replyContent = replyContent.replaceAll(B_PATTERN_str, "");
@@ -292,15 +290,17 @@ public class PullMain {
 		return null;
 	}
 
-	public void init(String threadname) throws ClientProtocolException, IOException, InterruptedException {
-		logger.info("init success.tid=" + tid + " sendUrl=" + sendUrl);
-		Object document = fetchData(9999999);
-		logger.info(document.toString());
-		synchronized (PullMain.class) {
-			Thread.sleep(30000);
+	public void init() throws ClientProtocolException, IOException, InterruptedException {
+		while (staticcurrentPage == 1 && staticcurrentFloor == 1) {
+			try {
+				Object document = fetchData(9999999);
+				staticcurrentPage = JsonPath.read(document, TOTAL_PAGE);
+				staticcurrentFloor = (Integer) JsonPath.read(document, V_ROWS) - 1;
+			} catch (Exception e) {
+				TimeUnit.SECONDS.sleep(5);
+			}
 		}
-		staticcurrentPage = JsonPath.read(document, TOTAL_PAGE);
-		staticcurrentFloor = (Integer) JsonPath.read(document, V_ROWS) - 1;
+		logger.info("{} init success.tid:{}", name, tid);
 		new Thread(() -> {
 			while (true) {
 				try {
@@ -314,7 +314,7 @@ public class PullMain {
 					e.printStackTrace();
 				}
 			}
-		}, threadname).start();
+		}, name).start();
 	}
 
 }
