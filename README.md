@@ -22,6 +22,8 @@
 
 作者名单现在暂时固定在代码内没有提出到配置文件中，后续版本会进一步进行游化
 
+钉钉推送机器人直接使用钉钉的webhook机器人api:[API](https://developers.dingtalk.com/document/app/custom-robot-access)
+
 也欢迎加入全禁言的**钉钉群：33102830** 接收推送消息
 
 # 此爬虫及钉钉群，仅做学习交流用。切勿盲信他人言论，更不要盲信这些大师大神
