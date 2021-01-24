@@ -262,7 +262,7 @@ public class PullMain {
 		// 把引用内容去掉
 		String rs = contentStr.replaceAll(QUOTE_PATTERN_str, "");
 		// update:把用br分段的字段也放大
-		rs = rs.replaceAll(BR_PATTERN_str, "\n ####");
+		rs = rs.replaceAll(BR_PATTERN_str, "\n #### ");
 		return rs;
 	}
 
