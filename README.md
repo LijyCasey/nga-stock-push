@@ -20,7 +20,7 @@
 
 要新增修改帖子也可以在application.yml中进行修改
 
-作者名单现在暂时固定在代码内没有提出到配置文件中，后续版本会进一步进行游化
+作者名单现在也在application.yml中进行配置
 
 钉钉推送机器人直接使用钉钉的webhook机器人api:[API](https://developers.dingtalk.com/document/app/custom-robot-access)
 
