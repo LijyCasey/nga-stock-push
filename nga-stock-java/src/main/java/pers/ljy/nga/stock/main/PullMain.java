@@ -136,7 +136,8 @@ public class PullMain {
 							int nowFloor = JsonPath.read(syncObj, "$.result[-1].lou");
 							logger.info("异步再次获取{}页的消息，现在的楼是{}", syncPage, nowFloor);
 							for (int i = qfloor; i <= syncfloor; i++) {
-								handleMessage(syncObj, i);
+								Object content = JsonPath.read(syncObj, "$.result[?(@.lou ==" + i + ")]");
+								sendMessage(content, syncObj);
 							}
 						} catch (ClientProtocolException e) {
 							e.printStackTrace();
